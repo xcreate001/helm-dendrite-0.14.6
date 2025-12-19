@@ -41,7 +41,7 @@ global:
   # sections. For monolith deployments using SQLite databases,
   # you must configure the "database" block for each component instead.
   database:
-    connection_string: host=9qasp5v56q8ckkf5dc.leapcellpool.com port=6438 user=nyxargmstuzkuumoygvr password=ewsxqocyognklmhernmdxbodotetvf dbname=nlbjyrcdeuffcaphsuec sslmode=require
+    connection_string: host=9qasp5v56q8ckkf5dc.leapcellpool.com port=6438 user=bpgceipohrrofnvrxvyb password=tcpdngdvkqxvdpgrqjfujffegwukeq dbname=lcnztydkpkdckauorcrq sslmode=require
     max_open_conns: 90
     max_idle_conns: 5
     conn_max_lifetime: -1
