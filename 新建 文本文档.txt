@@ -1,0 +1,6 @@
+
+
+go build -o app ./cmd/dendrite && go build -o generate-keys ./cmd/generate-keys
+
+
+sh entrypoint.sh

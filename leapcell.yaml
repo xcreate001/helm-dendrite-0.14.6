@@ -1,0 +1,5 @@
+
+runtime: go
+build_command: go build -o app ./cmd/dendrite && go build -o generate-keys ./cmd/generate-keys
+start_command: sh entrypoint.sh
+root: .

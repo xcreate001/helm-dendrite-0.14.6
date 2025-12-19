@@ -1,0 +1,61 @@
+#syntax=docker/dockerfile:1.2
+
+#
+# base installs required dependencies and runs go mod download to cache dependencies
+#
+FROM --platform=${BUILDPLATFORM} docker.io/golang:1.22-alpine AS base
+RUN apk --update --no-cache add bash build-base curl git
+
+#
+# build creates all needed binaries
+#
+FROM --platform=${BUILDPLATFORM} base AS build
+WORKDIR /src
+ARG TARGETOS
+ARG TARGETARCH
+RUN --mount=target=. \
+    --mount=type=cache,target=/root/.cache/go-build \
+    --mount=type=cache,target=/go/pkg/mod \
+    USERARCH=`go env GOARCH` \
+    GOARCH="$TARGETARCH" \
+    GOOS="linux" \
+    CGO_ENABLED=$([ "$TARGETARCH" = "$USERARCH" ] && echo "1" || echo "0") \
+    go build -v -trimpath -o /out/ ./cmd/...
+
+
+#
+# Builds the Dendrite image containing all required binaries
+#
+
+#
+# Builds the Dendrite image containing all required binaries
+#
+FROM alpine:latest
+RUN apk --update --no-cache add curl
+LABEL org.opencontainers.image.title="Dendrite"
+LABEL org.opencontainers.image.description="Next-generation Matrix homeserver written in Go"
+LABEL org.opencontainers.image.source="https://github.com/matrix-org/dendrite"
+LABEL org.opencontainers.image.licenses="Apache-2.0"
+LABEL org.opencontainers.image.documentation="https://matrix-org.github.io/dendrite/"
+LABEL org.opencontainers.image.vendor="The Matrix.org Foundation C.I.C."
+
+COPY --from=build /out/create-account /usr/bin/create-account
+COPY --from=build /out/generate-config /usr/bin/generate-config
+COPY --from=build /out/generate-keys /usr/bin/generate-keys
+COPY --from=build /out/dendrite /usr/bin/dendrite
+
+# Create configuration directory
+RUN mkdir -p /etc/dendrite
+
+# Copy configuration and entrypoint script
+COPY dendrite-leapcell.yaml /etc/dendrite/dendrite-leapcell.yaml
+COPY entrypoint.sh /usr/bin/entrypoint.sh
+RUN chmod +x /usr/bin/entrypoint.sh
+
+VOLUME /etc/dendrite
+WORKDIR /etc/dendrite
+
+ENTRYPOINT ["/usr/bin/entrypoint.sh"]
+CMD ["/usr/bin/dendrite", "--config", "/etc/dendrite/dendrite-leapcell.yaml"]
+EXPOSE 8008 8448
+
