@@ -10,7 +10,7 @@ version: 2
 # Global Matrix configuration. This configuration applies to all components.
 global:
   # The domain name of this homeserver.
-  server_name: localhost
+  server_name: helm-dendrite-540j3q5j.leapcell.dev
 
   # The path to the signing private key file, used to sign requests and events.
   # Note that this is NOT the same private key as used for TLS! To generate a
@@ -169,7 +169,7 @@ app_service_api:
 client_api:
   # Prevents new users from being able to register on this homeserver, except when
   # using the registration shared secret below.
-  registration_disabled: true
+  registration_disabled: false
 
   # Prevents new guest accounts from being created. Guest registration is also
   # disabled implicitly by setting 'registration_disabled' above.
